@@ -57,11 +57,22 @@
             </div>
 
             <form id="searchForm" class="search-form" onsubmit="return false;">
-                <!-- API 키 상태 표시 -->
-                <div class="api-key-status" id="apiKeyStatus">
-                    <span class="api-status-icon" id="apiStatusIcon">🔑</span>
-                    <span class="api-status-text" id="apiStatusText">API 키 확인 중...</span>
-                    <span class="api-status-hint">config.js 파일에서 설정됨</span>
+                <!-- API 키 설정 섹션 -->
+                <div class="api-settings-container glass-card" id="apiSettings">
+                    <div class="api-key-status connected" id="apiKeyStatus">
+                        <span class="api-status-icon" id="apiStatusIcon">🔑</span>
+                        <span class="api-status-text" id="apiStatusText">API 키 설정</span>
+                        <button type="button" class="btn-toggle-settings" id="toggleSettingsBtn">변경</button>
+                    </div>
+
+                    <div class="api-input-group" id="apiInputGroup" style="display: none;">
+                        <div class="input-with-button">
+                            <input type="password" id="userApiKey" class="form-input"
+                                placeholder="YouTube Data API v3 키를 입력하세요">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="saveUserApiKey()">저장</button>
+                        </div>
+                        <p class="api-help-text">키는 브라우저에 안전하게 저장되며 서버로 전송되지 않습니다.</p>
+                    </div>
                 </div>
 
                 <div class="form-row">

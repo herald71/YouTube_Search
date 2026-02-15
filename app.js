@@ -10,13 +10,18 @@ let isSearching = false;    // 검색 진행 중 플래그
 // ===== API 키 가져오기 =====
 
 /**
- * config.js에 설정된 API 키를 반환합니다.
- * 원본 Python 코드의 load_dotenv() + os.getenv("YOUTUBE_API_KEY")와 동일한 역할입니다.
+ * API 키를 가져옵니다. 
+ * 1. 브라우저 로컬 저장소(localStorage)를 확인
+ * 2. config.js 설정을 확인
  */
 function getApiKey() {
+    // 1. 로컬 저장소 확인
+    const savedKey = localStorage.getItem('YOUTUBE_SEARCH_KEY');
+    if (savedKey) return savedKey.trim();
+
+    // 2. config.js 확인
     if (typeof CONFIG !== 'undefined' && CONFIG.YOUTUBE_API_KEY) {
         const key = CONFIG.YOUTUBE_API_KEY.trim();
-        // 기본 placeholder 값인 경우 미설정으로 간주
         if (key && key !== '여기에_API_키를_입력하세요') {
             return key;
         }
@@ -26,8 +31,18 @@ function getApiKey() {
 
 // ===== 초기화 =====
 document.addEventListener('DOMContentLoaded', () => {
-    // config.js의 API 키 상태를 확인하여 뱃지에 표시
     checkApiKeyStatus();
+
+    // API 설정창 토글
+    const toggleBtn = document.getElementById('toggleSettingsBtn');
+    const inputGroup = document.getElementById('apiInputGroup');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            const isHidden = inputGroup.style.display === 'none';
+            inputGroup.style.display = isHidden ? 'block' : 'none';
+            toggleBtn.textContent = isHidden ? '닫기' : '변경';
+        });
+    }
 
     // Enter 키로 검색 실행
     document.getElementById('searchForm').addEventListener('keydown', (e) => {
@@ -36,10 +51,44 @@ document.addEventListener('DOMContentLoaded', () => {
             startSearch();
         }
     });
+
+    // 저장된 키가 있으면 입력창에 미리 채워두기 (단, 마스킹 처리는 UI에서만)
+    const savedKey = localStorage.getItem('YOUTUBE_SEARCH_KEY');
+    if (savedKey) {
+        document.getElementById('userApiKey').value = savedKey;
+    }
 });
 
 /**
- * config.js의 API 키 설정 여부를 확인하고 UI에 반영합니다.
+ * 사용자가 입력한 API 키를 로컬 저장소에 저장합니다.
+ */
+function saveUserApiKey() {
+    const keyInput = document.getElementById('userApiKey');
+    const key = keyInput.value.trim();
+
+    if (!key) {
+        if (confirm('API 키를 삭제하시겠습니까?')) {
+            localStorage.removeItem('YOUTUBE_SEARCH_KEY');
+            checkApiKeyStatus();
+            document.getElementById('apiInputGroup').style.display = 'none';
+            document.getElementById('toggleSettingsBtn').textContent = '변경';
+            addLog('API 키가 삭제되었습니다.', 'warn');
+        }
+        return;
+    }
+
+    localStorage.setItem('YOUTUBE_SEARCH_KEY', key);
+    checkApiKeyStatus();
+    alert('API 키가 안전하게 저장되었습니다! 이제 검색이 가능합니다.');
+    
+    // 입력창 닫기
+    document.getElementById('apiInputGroup').style.display = 'none';
+    document.getElementById('toggleSettingsBtn').textContent = '변경';
+    addLog('새로운 API 키가 설정되었습니다.', 'success');
+}
+
+/**
+ * API 키 설정 여부를 확인하고 UI에 반영합니다.
  */
 function checkApiKeyStatus() {
     const statusEl = document.getElementById('apiKeyStatus');
@@ -49,15 +98,16 @@ function checkApiKeyStatus() {
     const apiKey = getApiKey();
 
     if (apiKey) {
-        statusEl.className = 'api-key-status connected';
+        statusEl.classList.remove('disconnected');
+        statusEl.classList.add('connected');
         iconEl.textContent = '✅';
-        // API 키의 앞 4자만 보여주고 나머지는 마스킹
-        const maskedKey = apiKey.substring(0, 4) + '••••••••' + apiKey.substring(apiKey.length - 4);
-        textEl.textContent = `API 키 연결됨 (${maskedKey})`;
+        const maskedKey = apiKey.substring(0, 4) + '••••' + apiKey.substring(apiKey.length - 4);
+        textEl.textContent = `API 키 설정됨 (${maskedKey})`;
     } else {
-        statusEl.className = 'api-key-status disconnected';
+        statusEl.classList.remove('connected');
+        statusEl.classList.add('disconnected');
         iconEl.textContent = '❌';
-        textEl.textContent = 'API 키 미설정 — config.js 파일을 확인해 주세요';
+        textEl.textContent = 'API 키가 필요합니다';
     }
 }
 
