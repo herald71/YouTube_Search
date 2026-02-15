@@ -80,7 +80,7 @@ function saveUserApiKey() {
     localStorage.setItem('YOUTUBE_SEARCH_KEY', key);
     checkApiKeyStatus();
     alert('API 키가 안전하게 저장되었습니다! 이제 검색이 가능합니다.');
-    
+
     // 입력창 닫기
     document.getElementById('apiInputGroup').style.display = 'none';
     document.getElementById('toggleSettingsBtn').textContent = '변경';
@@ -223,13 +223,26 @@ async function startSearch() {
 
     // ---- 유효성 검증 ----
     if (!apiKey) {
-        alert('⚠️ API 키가 설정되지 않았습니다.\n\nconfig.js 파일을 열어서 YOUTUBE_API_KEY에 API 키를 입력해 주세요.');
+        alert('⚠️ API 키가 설정되지 않았습니다.\n\n[변경] 버튼을 눌러 API 키를 입력해 주세요.');
         return;
     }
 
     if (!searchQuery && !channelId) {
         alert('⚠️ 검색어와 채널 ID 중 하나 이상은 반드시 입력해야 합니다.');
         document.getElementById('searchQuery').focus();
+        return;
+    }
+
+    // 날짜 순서 체크
+    if (startDate && endDate && startDate > endDate) {
+        alert('⚠️ 시작 날짜는 종료 날짜보다 이전이어야 합니다.');
+        return;
+    }
+
+    // 채널 ID 형식 체크 (입력된 경우만)
+    if (channelId && !channelId.startsWith('UC')) {
+        alert('⚠️ 잘못된 채널 ID 형식입니다.\n\n채널 ID는 반드시 "UC"로 시작하는 고유 ID여야 합니다.\n(채널 주소나 @핸들은 사용할 수 없습니다)');
+        document.getElementById('channelId').focus();
         return;
     }
 
@@ -250,7 +263,7 @@ async function startSearch() {
     document.getElementById('resultsPanel').style.display = 'none';
     document.getElementById('resultsBody').innerHTML = '';
 
-    addLog('검색 조건으로 유튜브 검색을 시작합니다...', 'info');
+    addLog('검색 조건 유효성 확인 완료. 유튜브 검색을 시작합니다...', 'info');
 
     try {
         // ---- YouTube Search API 호출 ----
