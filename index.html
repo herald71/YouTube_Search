@@ -120,6 +120,20 @@
                         <input type="date" id="endDate" class="form-input">
                     </div>
 
+                    <!-- 영상 길이 필터 -->
+                    <div class="form-group" id="durationGroup">
+                        <label class="form-label" for="videoDuration">
+                            <span class="label-icon">⏱️</span>
+                            영상 길이
+                        </label>
+                        <select id="videoDuration" class="form-input">
+                            <option value="any">전체 (모든 길이)</option>
+                            <option value="short">짧음 (4분 미만)</option>
+                            <option value="medium">중간 (4분 ~ 20분)</option>
+                            <option value="long">길음 (20분 초과)</option>
+                        </select>
+                    </div>
+
                     <!-- 파일명 -->
                     <div class="form-group" id="fileNameGroup">
                         <label class="form-label" for="fileName">

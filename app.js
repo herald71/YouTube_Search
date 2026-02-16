@@ -220,6 +220,7 @@ async function startSearch() {
     const channelId = document.getElementById('channelId').value.trim();
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
+    const videoDuration = document.getElementById('videoDuration').value;
 
     // ---- 유효성 검증 ----
     if (!apiKey) {
@@ -267,7 +268,7 @@ async function startSearch() {
 
     try {
         // ---- YouTube Search API 호출 ----
-        await fetchYouTubeData(apiKey, searchQuery, channelId, startDate, endDate);
+        await fetchYouTubeData(apiKey, searchQuery, channelId, startDate, endDate, videoDuration);
 
         if (collectedVideos.length > 0) {
             // 통계 및 결과 표시
@@ -293,7 +294,7 @@ async function startSearch() {
 /**
  * YouTube Data API v3를 호출하여 동영상 데이터를 수집합니다.
  */
-async function fetchYouTubeData(apiKey, searchQuery, channelId, startDate, endDate) {
+async function fetchYouTubeData(apiKey, searchQuery, channelId, startDate, endDate, videoDuration) {
     let nextPageToken = null;
     let totalFetched = 0;
     const maxResults = 200;
@@ -310,6 +311,7 @@ async function fetchYouTubeData(apiKey, searchQuery, channelId, startDate, endDa
 
         if (searchQuery) params.set('q', searchQuery);
         if (channelId) params.set('channelId', channelId);
+        if (videoDuration && videoDuration !== 'any') params.set('videoDuration', videoDuration);
 
         if (startDate) {
             params.set('publishedAfter', `${startDate}T00:00:00Z`);
