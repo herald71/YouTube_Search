@@ -382,6 +382,13 @@ body {
     border-radius: var(--radius-md);
     outline: none;
     transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    color-scheme: dark; /* 브라우저 기본 UI(드롭다운 등)를 다크 모드로 설정 */
+}
+
+/* 선택창 옵션 스타일 보완 */
+select.form-input option {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 .form-input::placeholder {
